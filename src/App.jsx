@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from './Supabase';
 import { supabase } from './supabase';
 
 export default function App() {
