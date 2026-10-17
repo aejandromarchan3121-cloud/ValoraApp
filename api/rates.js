@@ -39,10 +39,16 @@ async function fetchJson(url, options = {}) {
 
 /* ---------- Fuentes USDT (Bs por 1 USDT) ---------- */
 const USDT_SOURCES = [
-  ['binance-p2p', async () => {
+ ['binance-p2p', async () => {
     const data = await fetchJson('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Origin': 'https://p2p.binance.com',
+        'Referer': 'https://p2p.binance.com/es/trade/all-payments/USDT?fiat=VES',
+        'Accept-Language': 'es-ES,es;q=0.9',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+      },
       body: JSON.stringify({
         fiat: 'VES', asset: 'USDT', tradeType: 'BUY', page: 1, rows: 10,
         payTypes: [], publisherType: null, countries: [],
