@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from './supabase';
+import { supabase } from "../supabase";
 
 /** % de cada ingreso que va al fondo. Persistido en public.user_settings (supabase/001_user_settings.sql). */
 export function useEmergencyRule() {
