@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
-import { supabase } from '../../Supabase';
+import { supabase } from '../../supabase';
 import { Button, Card, Input, Stat } from '../../components/ui';
 import { fmt, pct } from '../../lib/money';
 

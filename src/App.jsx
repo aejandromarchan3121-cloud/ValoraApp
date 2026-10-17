@@ -12,7 +12,7 @@ import CashPanel from './features/cash/CashPanel';
 import Inventory from './features/inventory/Inventory';
 import EmergencyFund from './features/emergency/EmergencyFund';
 import AiAgent from './features/ai/AiAgent';
-import Analytics from './features/analytics/Analytics';
+import Analytics from './features/Analytics/Analytics';
 
 function Dashboard() {
   const [view, setView] = useState('rates');
