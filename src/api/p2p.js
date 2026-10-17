@@ -1,38 +1,24 @@
-// api/p2p.js
-export async function obtenerTasaP2P(moneda, monto) {
-  const asset = 'USDT';
-  const tradeType = 'BUY'; // O SELL según la perspectiva
-  const payTypes = moneda === 'VES' ? ['PagoMovil'] : ['Bancolombia'];
+const URL = import.meta.env.VITE_P2P_URL;
 
-  try {
-    const response = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        asset,
-        fiat: moneda,
-        tradeType,
-        page: 1,
-        rows: 5,
-        payTypes,
-        transAmount: monto || null
-      })
-    });
-
-    const data = await response.json();
-    if (data && data.data && data.data.length > 0) {
-      // Tomamos la primera oferta con mejor tasa
-      const oferta = data.data[0].adv;
-      return {
-        tasa: parseFloat(oferta.price),
-        montoMinimo: parseFloat(oferta.minSingleTransAmount),
-        montoMaximo: parseFloat(oferta.maxSingleTransAmount),
-        comerciante: data.data[0].advertiser.nickName
-      };
-    }
-    return null;
-  } catch (error) {
-    console.error('Error al consultar Binance P2P:', error);
-    return null;
-  }
+/**
+ * Tasa USDT/VES. Para un comerciante que convierte Bs → USDT, compra USDT: tradeType 'BUY'.
+ * Devuelve la mediana de los primeros anuncios (más robusta que el mejor precio).
+ */
+export async function fetchP2PRate({ fiat = 'VES', tradeType = 'BUY', rows = 10, payTypes = [] } = {}) {
+  const res = await fetch(URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fiat, page: 1, rows, tradeType, asset: 'USDT', countries: [],
+      proMerchantAds: false, shieldMerchantAds: false, publisherType: null, payTypes,
+    }),
+  });
+  if (!res.ok) throw new Error(`Binance P2P respondió ${res.status}`);
+  const { data } = await res.json();
+  const prices = (data ?? []).map((d) => Number(d.adv.price)).filter(Boolean);
+  if (!prices.length) throw new Error('Sin anuncios P2P disponibles');
+  const s = [...prices].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  const median = s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+  return { price: median, best: tradeType === 'BUY' ? s[0] : s[s.length - 1], samples: s.length, at: new Date() };
 }
