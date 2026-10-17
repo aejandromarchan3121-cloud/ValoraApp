@@ -122,3 +122,29 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@layer components {
+  .glass-card {
+    @apply rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl
+           shadow-[0_8px_32px_rgba(0,0,0,0.35)];
+  }
+  .glass-card-hover { @apply transition hover:border-white/15 hover:bg-white/[0.05]; }
+  .glass-input {
+    @apply w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-100
+           placeholder:text-zinc-500 outline-none transition
+           focus:border-indigo-400/60 focus:ring-2 focus:ring-indigo-400/20;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5
+           text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10
+           px-3 py-2 text-sm text-zinc-300 transition hover:bg-white/5;
+  }
+  .stat-label { @apply text-[11px] font-medium uppercase tracking-wider text-zinc-500; }
+  .stat-value { @apply mt-1 text-2xl font-semibold tabular-nums text-zinc-50; }
+  .chip { @apply rounded-full border border-white/10 px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/5; }
+  .chip-active { @apply border-indigo-400/50 bg-indigo-500/15 text-indigo-200; }
+}
