@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-body { @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100; }
-* { @apply transition-colors duration-150; }
+body { 
+  @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100; 
+  margin: 0;
+}
+
+/* Selector universal corregido usando propiedades CSS nativas */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 
 :root {
   --text: #6b6375;
@@ -15,8 +24,7 @@ body { @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zi
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -48,17 +56,12 @@ body { @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zi
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
 
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
-}
-
-body {
-  margin: 0;
 }
 
 #root {
@@ -89,6 +92,7 @@ h1 {
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
@@ -98,6 +102,7 @@ h2 {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
