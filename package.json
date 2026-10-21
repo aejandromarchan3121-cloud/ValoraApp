@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^10.1.0",
     "@supabase/supabase-js": "^2.118.0",
     "lucide-react": "^1.58.0",
+    "next": "^16.4.2",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "stripe": "^23.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
