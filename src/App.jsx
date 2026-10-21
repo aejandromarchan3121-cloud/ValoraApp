@@ -13,6 +13,8 @@ import Inventory from './features/inventory/Inventory';
 import EmergencyFund from './features/emergency/EmergencyFund';
 import AiAgent from './features/ai/AiAgent';
 import Analytics from './features/analytics/Analytics';
+import DashboardModule from './components/DashboardModule'; // fintech USA-VENEZUELA Tarjeta
+
 
 function Dashboard() {
   const [view, setView] = useState('rates');
