@@ -1,6 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { fmt, toUSD } from '../lib/money';
 
-export default function DashboardModule({ userToken }) {
+const EMPTY_ROWS = [];
+
+export default function DashboardModule({ userToken, table, rates }) {
+  const rows = table?.rows ?? EMPTY_ROWS;
+  const p2p = rates?.p2p?.price;
+  const saldo = useMemo(
+    () => rows.reduce((total, transaction) => total + toUSD(transaction.amount, transaction.currency, { p2p }), 0),
+    [rows, p2p],
+  );
+
   // Estados para datos
   const [balance, setBalance] = useState(null);
   const [amount, setAmount] = useState('');
@@ -147,7 +157,46 @@ export default function DashboardModule({ userToken }) {
   };
 
   return (
-    <div className="p-6 bg-slate-900 text-white rounded-2xl shadow-xl max-w-md mx-auto mt-6 border border-slate-800">
+    <>
+      <section className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-6 text-white shadow-xl">
+        <h2 className="mb-4 text-2xl font-bold">Panel de Ingresos - ValoraApp</h2>
+
+        <div className="mb-6 rounded-lg border border-slate-700 bg-slate-800 p-6">
+          <p className="text-sm text-slate-400">Saldo disponible (equivalente USD)</p>
+          <p className="mt-1 text-4xl font-extrabold text-emerald-400">
+            {table?.loading ? 'Cargando…' : fmt(saldo)}
+          </p>
+        </div>
+
+        {table?.error && <p className="mb-4 text-sm text-rose-300">Error al cargar los movimientos: {table.error}</p>}
+
+        <div>
+          <h3 className="mb-3 text-lg font-semibold">Últimas transacciones</h3>
+          {table?.loading ? (
+            <p className="text-sm text-slate-400">Cargando movimientos…</p>
+          ) : rows.length === 0 ? (
+            <p className="text-sm text-slate-400">No hay transacciones registradas todavía.</p>
+          ) : (
+            <div className="space-y-2">
+              {rows.slice(0, 10).map((transaction) => (
+                <div key={transaction.id} className="flex items-center justify-between gap-4 rounded border border-slate-700/50 bg-slate-800 p-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{transaction.note || transaction.method}</p>
+                    <p className="text-xs text-slate-400">
+                      {new Date(transaction.created_at).toLocaleString('es-VE')} · {transaction.category}
+                    </p>
+                  </div>
+                  <span className={`shrink-0 font-bold ${Number(transaction.amount) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                    {fmt(transaction.amount, transaction.currency)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className="mx-auto mt-6 max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-white shadow-xl">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold tracking-wide text-emerald-400">ValoraApp • Billetera USDC</h2>
@@ -235,6 +284,7 @@ export default function DashboardModule({ userToken }) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

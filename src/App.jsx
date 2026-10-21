@@ -32,7 +32,7 @@ function Dashboard() {
     <AppShell view={view} setView={setView}>
       {view === 'rates' && <RateComparator rates={rates} />}
       {view === 'cash' && <CashPanel rates={rates} table={cashTable} />}
-      {view === 'wallet' && <DashboardModule />}
+      {view === 'wallet' && <DashboardModule table={cashTable} rates={rates} />}
       {view === 'inventory' && <Inventory rates={rates} />}
       {view === 'emergency' && (
         <UpgradeGate feature="emergency" title="El fondo de emergencia">
