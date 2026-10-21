@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 export default function DashboardModule() {
   const [amount, setAmount] = useState('');
@@ -17,11 +16,18 @@ export default function DashboardModule() {
   const handleSendExternal = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('/api/v1/onramp/checkout-session', {
-        user_id: 'current-user-uuid',
-        amount: parseFloat(amount)
+      const response = await fetch('/api/v1/onramp/checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'current-user-uuid',
+          amount: parseFloat(amount),
+        }),
       });
-      window.location.href = response.data.checkout_url;
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      if (!data.checkout_url) throw new Error('La respuesta no incluye checkout_url');
+      window.location.href = data.checkout_url;
     } catch (err) {
       console.error(err);
       alert('Error al procesar la sesión de pago');

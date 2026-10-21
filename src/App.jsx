@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlanProvider } from './context/PlanContext';
+import { useRatesContext } from './context/RatesContext';
 import { supabase } from './supabase';
-import { useRates } from './hooks/useRates';
 import { useTable } from './hooks/useTable';
 import AuthScreen from './components/auth/AuthScreen';
 import AppShell from './components/Layout/AppShell';
@@ -16,7 +16,7 @@ import Analytics from './features/analytics/Analytics';
 
 function Dashboard() {
   const [view, setView] = useState('rates');
-  const rates = useRates();
+  const rates = useRatesContext();
   const cashTable = useTable('cash_entries');
   const [fund, setFund] = useState(null);
 

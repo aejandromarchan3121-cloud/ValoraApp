@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { useRates } from '../features/rates/useRates';
+import { useRates } from '../hooks/useRates';
 
 const RatesContext = createContext(null);
 
