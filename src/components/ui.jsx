@@ -19,9 +19,11 @@ export const Button = ({ variant = 'primary', className, ...p }) => (
   />
 );
 
-const inputCls =
+export const inputCls =
   'w-full rounded-xl border border-zinc-200 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-zinc-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700';
+
 export const Input = (p) => <input className={inputCls} {...p} />;
+
 export const Select = ({ children, ...p }) => (
   <select className={inputCls + ' dark:bg-zinc-900'} {...p}>{children}</select>
 );
@@ -43,4 +45,22 @@ export const Stat = ({ label, value, hint, tone }) => (
     <p className={cx('mt-1 text-2xl font-semibold tabular-nums', tone)}>{value}</p>
     {hint && <p className="mt-1 text-xs text-zinc-500">{hint}</p>}
   </Card>
+);
+
+export const PageHeader = ({ title, subtitle, action }) => (
+  <div className="mb-6 flex items-end justify-between gap-4">
+    <div>
+      <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
+      {subtitle && <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>}
+    </div>
+    {action}
+  </div>
+);
+
+export const EmptyState = ({ icon: Icon, title, hint }) => (
+  <div className="flex flex-col items-center gap-2 py-10 text-center">
+    {Icon && <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-500/10 text-brand-500"><Icon size={22} /></div>}
+    <p className="text-sm font-medium">{title}</p>
+    {hint && <p className="max-w-xs text-xs text-zinc-500">{hint}</p>}
+  </div>
 );

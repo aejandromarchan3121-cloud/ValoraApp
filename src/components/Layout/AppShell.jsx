@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Boxes, Wallet, CreditCard, ArrowLeftRight, ShieldCheck, Sparkles, BarChart3, Moon, Sun, LogOut } from 'lucide-react';
+import { Boxes, Wallet, CreditCard, ArrowLeftRight, ShieldCheck, Sparkles, BarChart3, Moon, Sun, LogOut, Landmark } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePlan } from '../../context/PlanContext';
 import { PLAN_LABEL } from '../../lib/plans';
@@ -8,7 +8,7 @@ import { Badge, cx } from '../ui';
 export const NAV = [
   { id: 'rates', label: 'Tasas', icon: ArrowLeftRight },
   { id: 'cash', label: 'Caja', icon: Wallet },
-  { id: 'wallet', label: 'Billetera', icon: CreditCard },
+  { id: 'wallet', label: 'Billetera', icon: Landmark, full: true },
   { id: 'inventory', label: 'Inventario', icon: Boxes },
   { id: 'emergency', label: 'Emergencia', icon: ShieldCheck, full: true },
   { id: 'ai', label: 'Asistente', icon: Sparkles, full: true },

@@ -1,8 +1,14 @@
+// de-DE: punto de miles y coma decimal incluso con 4 dígitos (es-VE omite el punto en 1000).
+export const num = (n, d = 2) =>
+  new Intl.NumberFormat('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d }).format(Number(n) || 0);
+
 export const CURRENCIES = ['USD', 'EUR', 'VES', 'COP'];
+
 export const METHODS = {
   cash: ['Efectivo USD', 'Efectivo EUR', 'Efectivo Bs'],
   digital: ['Pago Móvil', 'Zelle', 'Bancolombia', 'Nequi'],
 };
+
 // ⚠️ Valores de respaldo editables: ajústalos o conéctalos a una API propia.
 export const FX_FALLBACK = { EUR_USD: 1.08, COP_PER_USD: 4000 };
 

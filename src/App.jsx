@@ -13,8 +13,7 @@ import Inventory from './features/inventory/Inventory';
 import EmergencyFund from './features/emergency/EmergencyFund';
 import AiAgent from './features/ai/AiAgent';
 import Analytics from './features/analytics/Analytics';
-import DashboardModule from './components/DashboardModule'; // fintech USA-VENEZUELA Tarjeta
-
+import WalletDashboard from './features/wallet/WalletDashboard';
 
 function Dashboard() {
   const [view, setView] = useState('rates');
@@ -26,13 +25,26 @@ function Dashboard() {
     const { data } = await supabase.from('emergency_fund').select('*').maybeSingle();
     setFund(data);
   }, []);
+  
   useEffect(() => { loadFund(); }, [loadFund]);
+
+  // Caja se refresca sola cuando el backend acredita un depósito (Realtime)
+  useEffect(() => {
+    const ch = supabase.channel('cash-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cash_entries' }, () => cashTable.reload())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AppShell view={view} setView={setView}>
       {view === 'rates' && <RateComparator rates={rates} />}
       {view === 'cash' && <CashPanel rates={rates} table={cashTable} />}
-      {view === 'wallet' && <DashboardModule table={cashTable} rates={rates} />}
+      {view === 'wallet' && (
+        <UpgradeGate feature="wallet" title="La billetera USDC">
+          <WalletDashboard />
+        </UpgradeGate>
+      )}
       {view === 'inventory' && <Inventory rates={rates} />}
       {view === 'emergency' && (
         <UpgradeGate feature="emergency" title="El fondo de emergencia">
