@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { QrCode, ExternalLink, Loader2, X } from 'lucide-react';
 import { Button } from '../../components/ui';
-import { useState } from 'react';
-import { Button, Input, Card } from '../../components/ui';
-
+  
 export default function DepositModal({ open, onClose, onDone }) {
   const [tab, setTab] = useState('binance'); // 'binance' | 'fiat'
   const [amount, setAmount] = useState('');
