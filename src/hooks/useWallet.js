@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabase';
 import { useAuth } from '../context/AuthContext';
 
 /** Billetera + perfil + últimos movimientos, con actualización en tiempo real (RLS aplica). */
