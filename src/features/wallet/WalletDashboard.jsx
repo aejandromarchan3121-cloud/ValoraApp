@@ -115,7 +115,7 @@ export default function WalletDashboard() {
         <TxList txs={txs} userId={userId} />
       </Card>
 
-      {/* Modales */}
+     {/* Modales */}
       <DepositModal open={modal === 'deposit'} onClose={close} onDone={reload} />
       <ReceiveModal open={modal === 'receive'} onClose={close} username={profile?.username} />
       <OnRampModal open={modal === 'onramp'} onClose={close} onDone={reload} />
