@@ -53,9 +53,14 @@ export default function WalletDashboard() {
   const close = () => setModal(null);
 
   // Validar estatus legal B2B al cargar el perfil
+ // Validar estatus legal B2B al cargar el perfil de manera estricta
   useEffect(() => {
-    if (profile && profile.terms_accepted_at === null) {
-      setShowTermsModal(true);
+    if (profile) {
+      if (!profile.terms_accepted_at) {
+        setShowTermsModal(true);
+      } else {
+        setShowTermsModal(false);
+      }
     }
   }, [profile]);
 
@@ -79,8 +84,8 @@ export default function WalletDashboard() {
   if (loading) return <p className="text-sm text-zinc-500">Cargando billetera…</p>;
   if (!wallet) return <p className="text-sm text-red-500">No se encontró tu billetera. Ejecuta la migración SQL y vuelve a entrar.</p>;
 
-  return (
-    <div className="space-y-5">
+    return (
+    <div className="space-y-5 relative">
       
       {/* Modal Obligatorio de Términos Comerciales B2B */}
       <BusinessTermsModal 
