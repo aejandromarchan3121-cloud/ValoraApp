@@ -54,12 +54,14 @@ export default function WalletDashboard() {
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
 
-// Validar estatus legal B2B de forma estricta
+/// Validar estatus legal B2B de forma segura
   useEffect(() => {
-    if (profile && profile.terms_accepted_at === null) {
-      setShowTermsModal(true);
-    } else if (profile && profile.terms_accepted_at) {
-      setShowTermsModal(false);
+    if (profile && profile.terms_accepted_at !== undefined) {
+      if (profile.terms_accepted_at === null) {
+        setShowTermsModal(true);
+      } else {
+        setShowTermsModal(false);
+      }
     }
   }, [profile]);
 
