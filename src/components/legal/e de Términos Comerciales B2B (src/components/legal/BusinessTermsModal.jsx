@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '../ui';
+import { Button } from './ui';
 
 export default function BusinessTermsModal({ open, onAccept }) {
   const [agreed, setAgreed] = useState(false);
