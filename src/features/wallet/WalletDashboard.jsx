@@ -52,7 +52,6 @@ export default function WalletDashboard() {
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
 
-  // Validar estatus legal B2B al cargar el perfil
  // Validar estatus legal B2B al cargar el perfil de manera estricta
   useEffect(() => {
     if (profile) {
@@ -112,7 +111,7 @@ export default function WalletDashboard() {
   icon={WalletCards} 
   label="Depositar / Recargar" 
   onClick={() => {
-    console.log("1. Clic detectado en Depositar");
+    console.log("Abriendo modal de depósito...");
     setModal('deposit');
   }} 
 />
@@ -128,7 +127,11 @@ export default function WalletDashboard() {
       </Card>
 
      {/* Modales */}
-      <DepositModal open={modal === 'deposit'} onClose={close} onDone={reload} />
+     <DepositModal 
+  open={modal === 'deposit'} 
+  onClose={() => setModal(null)} 
+  onDone={reload} 
+/>
       <ReceiveModal open={modal === 'receive'} onClose={close} username={profile?.username} />
       <OnRampModal open={modal === 'onramp'} onClose={close} onDone={reload} />
       <SendModal open={modal === 'send'} onClose={close} onDone={reload} balance={balance} />
