@@ -6,8 +6,8 @@
   },
   "rewrites": [
     { 
-      "source": "/api/(.*)", 
-      "destination": "/api/index.py" 
+      "src": "/api/(.*)",
+      "destination": "/valora-backend/app/api/$1" 
     },
     { 
       "source": "/(.*)", 
