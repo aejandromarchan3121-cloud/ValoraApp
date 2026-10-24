@@ -80,34 +80,50 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
 
   // Paso 1 (Fiat): Crear la orden y congelar la tasa
   const handleCreateOrder = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch('/api/v1/deposits/create-fiat-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: safeUserId, // ✅ ID real del hook (evita 422)
-          amount_fiat: Number(amountFiat),
-          currency,
-        }),
-      });
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const res = await fetch('/api/v1/deposits/create-fiat-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        amount_fiat: Number(amountFiat),
+        currency,
+      }),
+    });
 
-      const data = await res.json();
-
-      if (data.success) {
-        setOrderData(data);
-      } else {
-        console.error('Error creando orden fiat:', data);
-        alert(data?.message || 'No se pudo generar la orden fiat.');
-      }
-    } catch (err) {
-      console.error('Error creando orden fiat:', err);
-      alert('No se pudo generar la orden fiat. Intenta de nuevo.');
-    } finally {
-      setLoading(false);
+    // Si no es OK, NO intentes parsear JSON
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.error('create-fiat-order failed:', res.status, text);
+      alert(
+        `No se pudo crear la orden fiat (${res.status}). ` +
+        `Revisa que el endpoint acepte POST y que la ruta sea correcta.`
+      );
+      return;
     }
-  };
+
+    const dataText = await res.text(); // por si viene vacío
+    if (!dataText) {
+      alert('El servidor respondió vacío al crear la orden.');
+      return;
+    }
+
+    const data = JSON.parse(dataText);
+    if (data.success) setOrderData(data);
+    else {
+      console.error('Error creando orden fiat:', data);
+      alert(data?.message || 'No se pudo generar la orden fiat.');
+    }
+  } catch (err) {
+    console.error('Error creando orden fiat:', err);
+    alert('No se pudo generar la orden fiat. Intenta de nuevo.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Paso 2 (Fiat): Enviar el número de referencia del pago realizado
   const handleFinalizeReport = async () => {
