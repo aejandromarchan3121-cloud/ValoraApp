@@ -6,7 +6,8 @@ export default function DepositModal({ open, onClose, onDone }) {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [payData, setPayData] = useState(null);
-
+  console.log("2. Estado del modal open:", open);
+  
   if (!open) return null;
 
   const handleGenerateOrder = async (e) => {

@@ -103,7 +103,14 @@ export default function WalletDashboard() {
 
       {/* Botones de acción ampliados (5 opciones distribuidas limpiamente) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <Action icon={WalletCards} label="Depositar / Recargar" onClick={() => setModal('deposit')} />
+        <Action 
+  icon={WalletCards} 
+  label="Depositar / Recargar" 
+  onClick={() => {
+    console.log("1. Clic detectado en Depositar");
+    setModal('deposit');
+  }} 
+/>
         <Action icon={ArrowDownToLine} label="Recibir de EE. UU." onClick={() => setModal('receive')} />
         <Action icon={Globe} label="Enviar desde EE. UU." onClick={() => setModal('onramp')} />
         <Action icon={Send} label="Enviar @usuario" onClick={() => setModal('send')} />
