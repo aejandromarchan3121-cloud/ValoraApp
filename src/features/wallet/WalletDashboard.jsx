@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowDownToLine, ArrowUpFromLine, Globe, Send } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, Globe, Send, WalletCards } from 'lucide-react';
 import { supabase } from '../../supabase';
 import { Badge, Button, Card, Input, PageHeader } from '../../components/ui';
 import { useWallet } from '../../hooks/useWallet';
@@ -8,6 +8,7 @@ import OnRampModal from './OnRampModal';
 import ReceiveModal from './ReceiveModal';
 import SendModal from './SendModal';
 import WithdrawModal from './WithdrawModal';
+import DepositModal from './DepositModal'; // <-- Tu nuevo modal multicanal (asegúrate de crearlo)
 import TxList from './TxList';
 
 function UsernameSetup({ userId, onDone }) {
@@ -44,7 +45,7 @@ const Action = ({ icon: Icon, label, onClick }) => (
 
 export default function WalletDashboard() {
   const { wallet, profile, txs, loading, error, userId, reload } = useWallet();
-  const [modal, setModal] = useState(null); // receive | onramp | send | withdraw
+  const [modal, setModal] = useState(null); // receive | onramp | send | withdraw | deposit
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
 
@@ -65,7 +66,9 @@ export default function WalletDashboard() {
         <p className="mt-1 text-xs text-zinc-500">≈ {num(balance)} USD · tu saldo también se refleja en Caja</p>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {/* Botones de acción ampliados (5 opciones distribuidas limpiamente) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <Action icon={WalletCards} label="Depositar / Recargar" onClick={() => setModal('deposit')} />
         <Action icon={ArrowDownToLine} label="Recibir de EE. UU." onClick={() => setModal('receive')} />
         <Action icon={Globe} label="Enviar desde EE. UU." onClick={() => setModal('onramp')} />
         <Action icon={Send} label="Enviar @usuario" onClick={() => setModal('send')} />
@@ -77,6 +80,8 @@ export default function WalletDashboard() {
         <TxList txs={txs} userId={userId} />
       </Card>
 
+      {/* Modales */}
+      <DepositModal open={modal === 'deposit'} onClose={close} onDone={reload} />
       <ReceiveModal open={modal === 'receive'} onClose={close} username={profile?.username} />
       <OnRampModal open={modal === 'onramp'} onClose={close} onDone={reload} />
       <SendModal open={modal === 'send'} onClose={close} onDone={reload} balance={balance} />
