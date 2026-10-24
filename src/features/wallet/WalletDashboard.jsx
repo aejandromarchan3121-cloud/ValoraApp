@@ -133,10 +133,11 @@ return (
       </Card>
 
      {/* Modales */}
-     <DepositModal 
-  open={modal === 'deposit'} 
-  onClose={() => setModal(null)} 
-  onDone={reload} 
+   <DepositModal 
+  open={isModalOpen} 
+  onClose={() => setIsModalOpen(false)} 
+  userId={user?.id} // 👈 Asegúrate de pasarle esta prop con el ID real
+  onDone={refetchData} 
 />
       <ReceiveModal open={modal === 'receive'} onClose={close} username={profile?.username} />
       <OnRampModal open={modal === 'onramp'} onClose={close} onDone={reload} />

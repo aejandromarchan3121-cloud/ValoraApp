@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button, Input } from '../../components/ui';
 
 export default function DepositModal({ open, onClose, userId, onDone }) {
-  const [tab, setTab] = useState('binance'); // 'binance' | 'fiat'
-  
+  const [tab, setTab] = useState('binance');
+  const [currentUserId, setCurrentUserId] = useState(''); // 👈 Estado local para el ID
   // Estados para Binance Pay
   const [amountBinance, setAmountBinance] = useState('');
   
@@ -21,7 +21,7 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
   const handleBinanceDeposit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://valora-backend-mczw.onrender.com/api/deposits/create-binance-order', {
+      const response = await fetch('https://valora-backend-mczw.onrender.com/api/v1/deposits/create-binance-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: Number(amountBinance) })
@@ -38,18 +38,22 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
   };
 
   // Paso 1 (Fiat): Crear la orden y congelar la tasa
-  const handleCreateOrder = async (e) => {
+const handleCreateOrder = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await fetch('https://valora-backend-mczw.onrender.com/api/v1/deposits/create-fiat-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, amount_fiat: Number(amountFiat), currency })
+        body: JSON.stringify({ 
+          user_id: currentUserId, // 👈 Aquí se envía el ID obtenido de Supabase
+          amount_fiat: Number(amountFiat), 
+          currency 
+        })
       });
       const data = await res.json();
       if (data.success) {
-        setOrderData(data); // Guardamos la orden generada con sus datos y tasa congelada
+        setOrderData(data);
       }
     } catch (err) {
       console.error('Error creando orden fiat:', err);
@@ -58,7 +62,7 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
       setLoading(false);
     }
   };
-
+  
   // Paso 2 (Fiat): Enviar el número de referencia del pago realizado
   const handleFinalizeReport = async () => {
     setLoading(true);
