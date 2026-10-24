@@ -22,7 +22,9 @@ function UsernameSetup({ userId, onDone }) {
     if (error) setErr(error.code === '23505' ? 'Ese @usuario ya existe.' : 'No se pudo guardar.');
     else onDone();
   };
+  
   return (
+    
     <Card>
       <p className="font-medium">Elige tu @usuario</p>
       <p className="text-sm text-zinc-500">Así te encontrarán para enviarte dinero. Minúsculas, números y _ (3–20).</p>
@@ -52,13 +54,12 @@ export default function WalletDashboard() {
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
 
- // Validar estatus legal B2B al cargar el perfil de manera estricta
+// Validar estatus legal B2B de forma estricta
   useEffect(() => {
     if (profile) {
+      console.log("Estado actual de terms_accepted_at:", profile.terms_accepted_at);
       if (!profile.terms_accepted_at) {
         setShowTermsModal(true);
-      } else {
-        setShowTermsModal(false);
       }
     }
   }, [profile]);
@@ -83,10 +84,10 @@ export default function WalletDashboard() {
   if (loading) return <p className="text-sm text-zinc-500">Cargando billetera…</p>;
   if (!wallet) return <p className="text-sm text-red-500">No se encontró tu billetera. Ejecuta la migración SQL y vuelve a entrar.</p>;
 
-    return (
+return (
     <div className="space-y-5 relative">
       
-      {/* Modal Obligatorio de Términos Comerciales B2B */}
+      {/* Forzar renderizado directo si showTermsModal es true */}
       <BusinessTermsModal 
         open={showTermsModal} 
         onAccept={handleAcceptTerms} 
