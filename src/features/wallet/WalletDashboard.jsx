@@ -56,11 +56,10 @@ export default function WalletDashboard() {
 
 // Validar estatus legal B2B de forma estricta
   useEffect(() => {
-    if (profile) {
-      console.log("Estado actual de terms_accepted_at:", profile.terms_accepted_at);
-      if (!profile.terms_accepted_at) {
-        setShowTermsModal(true);
-      }
+    if (profile && profile.terms_accepted_at === null) {
+      setShowTermsModal(true);
+    } else if (profile && profile.terms_accepted_at) {
+      setShowTermsModal(false);
     }
   }, [profile]);
 
@@ -73,8 +72,12 @@ export default function WalletDashboard() {
         .eq('id', userId);
 
       if (error) throw error;
+      
+      // Ocultar el modal de inmediato de forma local
       setShowTermsModal(false);
-      reload(); // Recargar datos para refrescar el perfil
+      
+      // Recargar los datos del perfil para refrescar el estado
+      await reload(); 
     } catch (err) {
       console.error('Error al registrar aceptación de términos:', err);
       alert('No se pudo registrar el acuerdo. Intenta de nuevo.');
