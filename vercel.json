@@ -1,13 +1,13 @@
 {
   "functions": {
-    "api/index.py": {
-      "maxDuration": 15
+    "valora-backend/app/api/index.py": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
-    { 
-      "src": "/api/(.*)",
-      "destination": "/valora-backend/app/api/$1" 
+    {
+      "source": "/api/(.*)",
+      "destination": "/valora-backend/app/api/$1"
     },
     { 
       "source": "/(.*)", 
