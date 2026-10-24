@@ -42,7 +42,7 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('https://valora-backend-mczw.onrender.com/api/deposits/create-fiat-order', {
+      const res = await fetch('https://valora-backend-mczw.onrender.com/api/v1/deposits/create-fiat-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, amount_fiat: Number(amountFiat), currency })
