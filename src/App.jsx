@@ -14,6 +14,95 @@ import EmergencyFund from './features/emergency/EmergencyFund';
 import AiAgent from './features/ai/AiAgent';
 import Analytics from './features/analytics/Analytics';
 import WalletDashboard from './features/wallet/WalletDashboard';
+import { useState, useEffect } from 'react';
+import BusinessTermsModal from '../../components/legal/BusinessTermsModal';
+import { supabase } from './supabase'; // Ajusta la ruta según tu cliente de Supabase
+
+export default function WalletDashboard() {
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    checkBusinessProfile();
+  }, []);
+
+  // 1. Verificar si el comercio ya aceptó los términos legales
+  const checkBusinessProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('terms_accepted_at, company_name, tax_id')
+        .eq('id', user.id)
+        .single();
+
+      // Si no existe la fecha de aceptación, forzar la aparición del modal
+      if (profile && !profile.terms_accepted_at) {
+        setShowTermsModal(true);
+      }
+    } catch (err) {
+      console.error('Error verificando estatus KYB del comercio:', err);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  // 2. Registrar la aceptación legal en Supabase
+  const handleAcceptTerms = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ terms_accepted_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Cerrar el modal una vez guardado con éxito
+      setShowTermsModal(false);
+    } catch (err) {
+      console.error('Error al guardar la aceptación de términos:', err);
+      alert('Hubo un error al registrar el acuerdo. Intenta de nuevo.');
+    }
+  };
+
+  if (loadingProfile) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-zinc-950 text-zinc-100">
+        <p className="text-sm animate-pulse">Cargando entorno seguro B2B...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6">
+      
+      {/* Modal de Términos Comerciales B2B Obligatorio */}
+      <BusinessTermsModal 
+        open={showTermsModal} 
+        onAccept={handleAcceptTerms} 
+      />
+
+      {/* Encabezado y contenido de la Billetera */}
+      <header className="flex justify-between items-center mb-6 pb-4 border-b border-zinc-800">
+        <div>
+          <h1 className="text-xl font-bold">ValoraApp B2B Portal</h1>
+          <p className="text-xs text-zinc-400">Infraestructura de pagos y liquidez corporativa</p>
+        </div>
+      </header>
+
+      {/* Resto de tu panel de transacciones, botones de depósito, etc. */}
+      <div className="grid gap-4">
+        {/* Aquí va tu WalletDashboard actual */}
+      </div>
+
+    </div>
+  );
+}
 
 function Dashboard() {
   const [view, setView] = useState('rates');
