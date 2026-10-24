@@ -14,8 +14,10 @@ export default function DepositModal({ open, onClose, onDone }) {
     setLoading(true);
 
     try {
-      // Llamada al backend en Render para generar la orden en Binance Pay
-      const res = await fetch('/api/deposits/create-binance-order', {
+      // Usar la variable de entorno de Vite o la URL directa de Render como respaldo
+      const API_URL = import.meta.env.VITE_API_URL || 'https://valora-backend-mczw.onrender.com';
+      
+      const res = await fetch(`${API_URL}/api/deposits/create-binance-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: Number(amount) })
