@@ -1,11 +1,17 @@
 {
   "functions": {
-    "api/rates.js": {
+    "api/index.py": {
       "maxDuration": 15
     }
   },
-
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "api/index.py" }
+    { 
+      "source": "/api/(.*)", 
+      "destination": "/api/index.py" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "/index.html" 
+    }
   ]
 }
