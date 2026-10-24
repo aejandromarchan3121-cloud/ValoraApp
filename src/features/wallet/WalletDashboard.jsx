@@ -1,157 +1,126 @@
-import { useState, useEffect } from 'react';
-import { ArrowDownToLine, ArrowUpFromLine, Globe, Send, WalletCards } from 'lucide-react';
-import { supabase } from '../../supabase';
-import { Badge, Button, Card, Input, PageHeader } from '../../components/ui';
-import { useWallet } from '../../hooks/useWallet';
-import { num } from '../../lib/money';
-import OnRampModal from './OnRampModal';
-import ReceiveModal from './ReceiveModal';
-import SendModal from './SendModal';
-import WithdrawModal from './WithdrawModal';
-import DepositModal from './DepositModal';
-import TxList from './TxList';
-import BusinessTermsModal from '../../components/legal/BusinessTermsModal';
+import { useState } from 'react';
+import { Button, Input, Modal } from '../../components/ui';
 
-function UsernameSetup({ userId, onDone }) {
-  const [u, setU] = useState('');
-  const [err, setErr] = useState(null);
-  const valid = /^[a-z0-9_]{3,20}$/.test(u);
+export default function DepositModal({ open, onClose, userId, onDone }) {
+  const [amountFiat, setAmountFiat] = useState('');
+  const [currency, setCurrency] = useState('VES'); // 'VES' o 'COP'
+  const [loading, setLoading] = useState(false);
+  const [orderData, setOrderData] = useState(null);
 
-  const save = async (e) => {
+  const handleCreateOrder = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.from('profiles').update({ username: u }).eq('id', userId);
-    if (error) setErr(error.code === '23505' ? 'Ese @usuario ya existe.' : 'No se pudo guardar.');
-    else onDone();
-  };
-
-  return (
-    <Card>
-      <p className="font-medium">Elige tu @usuario</p>
-      <p className="text-sm text-zinc-500">Así te encontrarán para enviarte dinero. Minúsculas, números y _ (3–20).</p>
-
-      <form onSubmit={save} className="mt-3 flex gap-2">
-        <Input
-          placeholder="tu_usuario"
-          value={u}
-          autoCapitalize="none"
-          onChange={(e) => {
-            setU(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
-            setErr(null);
-          }}
-        />
-        <Button disabled={!valid}>Guardar</Button>
-      </form>
-
-      {err && <p className="mt-2 text-sm text-red-500">{err}</p>}
-    </Card>
-  );
-}
-
-const Action = ({ icon: Icon, label, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-white/80 p-3 text-xs font-medium transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 dark:border-zinc-800 dark:bg-zinc-900/70"
-  >
-    <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-500/10 text-brand-500">
-      <Icon size={18} />
-    </span>
-    {label}
-  </button>
-);
-
-export default function WalletDashboard() {
-  const { wallet, profile, txs, loading, error, userId, reload } = useWallet();
-  const [modal, setModal] = useState(null); // receive | onramp | send | withdraw | deposit
-  const [showTermsModal, setShowTermsModal] = useState(false);
-
-  const balance = Number(wallet?.usdc_balance ?? 0);
-  const close = () => setModal(null);
-
-  // Validar estatus legal B2B de forma segura
-  useEffect(() => {
-    if (profile && profile.terms_accepted_at !== undefined) {
-      if (profile.terms_accepted_at === null) setShowTermsModal(true);
-      else setShowTermsModal(false);
-    }
-  }, [profile]);
-
-  // Manejar la aceptación del contrato comercial B2B
-  const handleAcceptTerms = async () => {
+    setLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ terms_accepted_at: new Date().toISOString() })
-        .eq('id', userId);
+      // Ruta ajustada exactamente al prefijo de tu backend FastAPI (/api/v1/deposits/...)
+      const res = await fetch('/api/v1/deposits/create-fiat-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          amount_fiat: Number(amountFiat),
+          currency,
+        }),
+      });
 
-      if (error) throw error;
+      // Si no es OK, leemos como texto plano para evitar que explote con HTML o errores de servidor
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('create-fiat-order failed:', res.status, text);
+        alert(
+          `No se pudo crear la orden fiat (${res.status}). ` +
+          `Revisa los datos ingresados o el servidor.`
+        );
+        return;
+      }
 
-      setShowTermsModal(false);
-      await reload();
+      const dataText = await res.text();
+      if (!dataText) {
+        alert('El servidor respondió vacío al crear la orden.');
+        return;
+      }
+
+      const data = JSON.parse(dataText);
+      if (data.success) {
+        setOrderData(data);
+        if (onDone) onDone();
+      } else {
+        console.error('Error creando orden fiat:', data);
+        alert(data?.message || 'No se pudo generar la orden fiat.');
+      }
     } catch (err) {
-      console.error('Error al registrar aceptación de términos:', err);
-      alert('No se pudo registrar el acuerdo. Intenta de nuevo.');
+      console.error('Error creando orden fiat:', err);
+      alert('No se pudo generar la orden fiat. Intenta de nuevo.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <p className="text-sm text-zinc-500">Cargando billetera…</p>;
-  if (!wallet) return <p className="text-sm text-red-500">No se encontró tu billetera. Ejecuta la migración SQL y vuelve a entrar.</p>;
+  const resetAndClose = () => {
+    setOrderData(null);
+    setAmountFiat('');
+    onClose();
+  };
 
   return (
-    <div className="space-y-5 relative">
-      <BusinessTermsModal open={showTermsModal} onAccept={handleAcceptTerms} />
+    <Modal open={open} onClose={resetAndClose} title="Depositar / Recargar Fiat">
+      {!orderData ? (
+        <form onSubmit={handleCreateOrder} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-1">Moneda local</label>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <option value="VES">Bolívares (VES)</option>
+              <option value="COP">Pesos Colombianos (COP)</option>
+            </select>
+          </div>
 
-      <PageHeader
-        title="Billetera B2B"
-        subtitle="Liquidez en dólares digitales (USDC) para comercios y empresas."
-        action={profile?.username && <Badge tone="brand">@{profile.username}</Badge>}
-      />
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-1">Monto a depositar</label>
+            <Input
+              type="number"
+              step="any"
+              placeholder="0.00"
+              value={amountFiat}
+              onChange={(e) => setAmountFiat(e.target.value)}
+              required
+            />
+          </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+          <Button className="w-full" disabled={loading}>
+            {loading ? 'Generando orden...' : 'Crear orden de depósito'}
+          </Button>
+        </form>
+      ) : (
+        <div className="space-y-4 text-sm">
+          <div className="rounded-xl bg-emerald-50 p-3 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+            <p className="font-semibold">¡Orden generada con éxito!</p>
+            <p className="text-xs mt-1">Número de orden: <b>{orderData.order_id}</b></p>
+          </div>
 
-      {wallet.status !== 'ACTIVE' && (
-        <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400">
-          Tu billetera está {wallet.status === 'FROZEN' ? 'congelada' : 'cerrada'}. Contacta a soporte.
-        </p>
+          <div className="space-y-1 text-zinc-600 dark:text-zinc-300">
+            <p><b>Monto Fiat:</b> {orderData.amount_fiat} {orderData.currency}</p>
+            <p><b>Equivalente Crypto:</b> {orderData.amount_crypto} USDC</p>
+            <p><b>Tasa de cambio:</b> {orderData.exchange_rate}</p>
+          </div>
+
+          {orderData.bank_details && (
+            <div className="rounded-xl border border-zinc-200 p-3 dark:border-zinc-800 space-y-1">
+              <p className="font-medium text-xs text-zinc-500 uppercase">Datos bancarios para transferencia:</p>
+              <p><b>Banco:</b> {orderData.bank_details.bank}</p>
+              <p><b>Cuenta:</b> {orderData.bank_details.account}</p>
+              <p><b>RIF/NIT:</b> {orderData.bank_details.rif_or_nit}</p>
+              <p><b>Teléfono:</b> {orderData.bank_details.phone}</p>
+            </div>
+          )}
+
+          <Button className="w-full" variant="outline" onClick={resetAndClose}>
+            Cerrar
+          </Button>
+        </div>
       )}
-
-      {!profile?.username && <UsernameSetup userId={userId} onDone={reload} />}
-
-      <Card className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-transparent to-emerald-500/10">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Saldo disponible en Caja</p>
-        <p className="mt-1 text-4xl font-semibold tabular-nums">
-          {num(balance)} <span className="text-lg text-zinc-500">USDC</span>
-        </p>
-        <p className="mt-1 text-xs text-zinc-500">≈ {num(balance)} USD · respaldado bajo infraestructura corporativa</p>
-      </Card>
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <Action
-          icon={WalletCards}
-          label="Depositar / Recargar"
-          onClick={() => setModal('deposit')}
-        />
-        <Action icon={ArrowDownToLine} label="Recibir de EE. UU." onClick={() => setModal('receive')} />
-        <Action icon={Globe} label="Enviar desde EE. UU." onClick={() => setModal('onramp')} />
-        <Action icon={Send} label="Enviar @usuario" onClick={() => setModal('send')} />
-        <Action icon={ArrowUpFromLine} label="Retirar a Binance" onClick={() => setModal('withdraw')} />
-      </div>
-
-      <Card>
-        <p className="mb-2 text-sm font-medium">Movimientos recientes</p>
-        <TxList txs={txs} userId={userId} />
-      </Card>
-
-      {/* Modales */}
-      <DepositModal
-        open={modal === 'deposit'}
-        onClose={close}
-        userId={userId}
-        onDone={reload}
-      />
-      <ReceiveModal open={modal === 'receive'} onClose={close} username={profile?.username} />
-      <OnRampModal open={modal === 'onramp'} onClose={close} onDone={reload} />
-      <SendModal open={modal === 'send'} onClose={close} onDone={reload} balance={balance} />
-      <WithdrawModal open={modal === 'withdraw'} onClose={close} onDone={reload} balance={balance} />
-    </div>
+    </Modal>
   );
 }

@@ -192,11 +192,12 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
               Recarga instantánea en USDC usando saldo o pasarela de Binance Pay.
             </p>
             <Input
-              placeholder="Monto en USD (Ej. 50)"
-              type="number"
-              value={amountBinance}
-              onChange={(e) => setAmountBinance(e.target.value)}
-            />
+  placeholder="Monto en USD (Ej. 50.50)"
+  type="number"
+  step="any"
+  value={amountBinance}
+  onChange={(e) => setAmountBinance(e.target.value)}
+/>
             <Button
               onClick={handleBinanceDeposit}
               disabled={loading || !amountBinance}
@@ -241,12 +242,13 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
             <div className="space-y-1">
               <label>¿Cuánto deseas gastar en {currency}?</label>
               <Input
-                type="number"
-                placeholder={currency === 'VES' ? 'Ej. 2000' : 'Ej. 400000'}
-                value={amountFiat}
-                onChange={(e) => setAmountFiat(e.target.value)}
-                required
-              />
+  type="number"
+  step="any"
+  placeholder={currency === 'VES' ? 'Ej. 2000.50' : 'Ej. 400000.00'}
+  value={amountFiat}
+  onChange={(e) => setAmountFiat(e.target.value)}
+  required
+/>
             </div>
 
             <Button type="submit" disabled={loading || !amountFiat} className="w-full">
