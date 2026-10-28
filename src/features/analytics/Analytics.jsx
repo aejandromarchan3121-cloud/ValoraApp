@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { BarChart3, FlaskConical } from 'lucide-react';
 import { Card, EmptyState, PageHeader, Stat, cx } from '../../components/ui';
 import { fmt, toUSD } from '../../lib/money';
-import { METRICS, RANGES, useRateCandles } from '../../hooks/useRateCandles';
+import { METRICS, RANGES, useRateCandles } from "../../hooks/useRateCandles";
 import CandlestickChart from './CandlestickChart';
 
 function Segmented({ options, value, onChange, label }) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowDownToLine, ArrowUpFromLine, CreditCard, Globe, Send } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../supabase';
 import { Badge, Button, Card, Input, PageHeader } from '../../components/ui';
 import { useWallet } from '../../hooks/useWallet';
 import { num } from '../../lib/money';
