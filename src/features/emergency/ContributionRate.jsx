@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Check, Percent } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../supabase';
 import { useAuth } from '../../context/AuthContext';
 import MoneyInput from '../../components/MoneyInput';
 import { Button, Card, cx } from '../../components/ui';
