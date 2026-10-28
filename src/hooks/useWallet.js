@@ -6,10 +6,10 @@ import { useAuth } from '../context/AuthContext';
 export function useWallet() {
   const { user } = useAuth();
   const [state, setState] = useState({ wallet: null, profile: null, txs: [], loading: true, error: null });
-  const load = useCallback(async () => {
+ const load = useCallback(async () => {
     if (!user) return;
     const [w, p, t] = await Promise.all([
-      supabase.from('wallets').select('*').maybeSingle(),
+      supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(), // <-- Añadido .eq('user_id', user.id)
       supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
       supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(30),
     ]);
