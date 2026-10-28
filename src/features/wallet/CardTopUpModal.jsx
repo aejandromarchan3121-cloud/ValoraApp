@@ -33,14 +33,14 @@ export default function CardTopUpModal({ open, onClose, onSuccess }) {
       if (!user) throw new Error("No hay sesión activa.");
 
       // Se envían 'amount' y 'currency' para solucionar la restricción NOT NULL de la DB
-      const { error: txError } = await supabase.from('transactions').insert({
+     const { error: txError } = await supabase.from('transactions').insert({
         user_id: user.id,
-        amount: amountNumeric,                          // Campo 'amount' requerido por Supabase
-        currency: selectedMethod.currency,             // Campo 'currency' requerido por Supabase
+        amount: amountNumeric,
+        currency: selectedMethod.currency,
         transaction_type: `DEPOSIT_${selectedMethod.id}`,
         amount_bs: selectedMethod.id === 'BS' ? amountNumeric : null,
         amount_usdc: montoUsdc,
-        status: 'PENDING_VERIFICATION'
+        status: 'PENDING' // <--- Cambia esto por 'PENDING', 'COMPLETED' o el estado que use tu base de datos
       });
 
       if (txError) throw txError;
