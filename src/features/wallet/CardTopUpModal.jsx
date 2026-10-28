@@ -37,7 +37,7 @@ export default function CardTopUpModal({ open, onClose, onSuccess }) {
         user_id: user.id,
         amount: amountNumeric,                          // Campo 'amount' requerido por Supabase
         currency: selectedMethod.currency,             // Campo 'currency' requerido por Supabase
-        type: `DEPOSIT_${selectedMethod.id}`,
+        transaction_type: `DEPOSIT_${selectedMethod.id}`,
         amount_bs: selectedMethod.id === 'BS' ? amountNumeric : null,
         amount_usdc: montoUsdc,
         status: 'PENDING_VERIFICATION'
