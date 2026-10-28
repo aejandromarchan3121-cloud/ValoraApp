@@ -64,3 +64,16 @@ export const EmptyState = ({ icon: Icon, title, hint }) => (
     {hint && <p className="max-w-xs text-xs text-zinc-500">{hint}</p>}
   </div>
 );
+
+// Componente Modal añadido para satisfacer la importación en WalletDashboard
+export const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-2xl space-y-4">
+        {title && <h3 className="text-lg font-bold">{title}</h3>}
+        {children}
+      </div>
+    </div>
+  );
+};
