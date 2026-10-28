@@ -148,3 +148,52 @@ code {
   .chip { @apply rounded-full border border-white/10 px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/5; }
   .chip-active { @apply border-indigo-400/50 bg-indigo-500/15 text-indigo-200; }
 }
+
+.brand-mark {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(135deg, #4f46e5, #0891b2 58%, #7c3aed);
+  box-shadow: 0 0 18px rgb(99 102 241 / 35%), inset 0 1px 0 rgb(255 255 255 / 28%);
+}
+
+.brand-mark::after {
+  position: absolute;
+  z-index: -1;
+  inset: -50% auto -50% -60%;
+  width: 45%;
+  content: '';
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
+  transform: rotate(25deg);
+  animation: brand-mark-shine 5s ease-in-out infinite;
+}
+
+.brand-wordmark {
+  color: transparent;
+  background: linear-gradient(100deg, #4338ca 5%, #0891b2 48%, #7c3aed 90%, #4338ca);
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: brand-wordmark-glow 7s ease-in-out infinite;
+}
+
+.dark .brand-wordmark {
+  background-image: linear-gradient(100deg, #a5b4fc 5%, #67e8f9 48%, #c4b5fd 90%, #a5b4fc);
+}
+
+@keyframes brand-mark-shine {
+  0%, 62% { left: -60%; }
+  82%, 100% { left: 140%; }
+}
+
+@keyframes brand-wordmark-glow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark::after,
+  .brand-wordmark {
+    animation: none;
+  }
+}

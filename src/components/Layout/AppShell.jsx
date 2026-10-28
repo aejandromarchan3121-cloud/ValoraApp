@@ -34,8 +34,8 @@ export default function AppShell({ view, setView, children }) {
       {/* Sidebar desktop */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-zinc-200 p-4 dark:border-zinc-800 md:flex">
         <div className="mb-6 flex items-center gap-2 px-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 font-bold text-white">$</div>
-          <span className="font-semibold">CajaP2P</span>
+          <div className="brand-mark grid h-8 w-8 place-items-center rounded-lg font-bold text-white">$</div>
+          <span className="brand-wordmark font-semibold">ValoraApp</span>
           <Badge tone={plan === 'full' ? 'brand' : 'zinc'}>{PLAN_LABEL[plan]}</Badge>
         </div>
         <nav className="space-y-1">
@@ -60,9 +60,15 @@ export default function AppShell({ view, setView, children }) {
       </aside>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-6 md:px-8 md:pb-10">
-        <div className="mb-4 flex justify-end gap-1 md:hidden">
-          <button onClick={() => setDark(!dark)} className="rounded-lg p-2 text-zinc-500">{dark ? <Sun size={18} /> : <Moon size={18} />}</button>
-          <button onClick={signOut} className="rounded-lg p-2 text-zinc-500"><LogOut size={18} /></button>
+        <div className="mb-4 flex items-center justify-between md:hidden">
+          <div className="flex items-center gap-2">
+            <div className="brand-mark grid h-8 w-8 place-items-center rounded-lg font-bold text-white">$</div>
+            <span className="brand-wordmark font-semibold">ValoraApp</span>
+          </div>
+          <div className="flex gap-1">
+            <button onClick={() => setDark(!dark)} className="rounded-lg p-2 text-zinc-500">{dark ? <Sun size={18} /> : <Moon size={18} />}</button>
+            <button onClick={signOut} className="rounded-lg p-2 text-zinc-500"><LogOut size={18} /></button>
+          </div>
         </div>
         {children}
       </main>
