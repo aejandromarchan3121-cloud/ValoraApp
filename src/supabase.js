@@ -1,13 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl) {
-  console.error("⚠️ ALERTA: VITE_SUPABASE_URL no está definida");
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("Faltan las variables de entorno de Supabase en Vercel");
 }
 
-export const supabase = createClient(
-  supabaseUrl || '', 
-  supabaseAnonKey || ''
-)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
