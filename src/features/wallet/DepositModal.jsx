@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Button, Input } from '../../components/ui';
 
+// Definir la URL base del backend apuntando a Render por defecto si la variable no está inyectada
+const API_URL = import.meta.env.VITE_API_URL || 'https://valora-backend-mczw.onrender.com';
+
 export default function DepositModal({ open, onClose, userId, onDone }) {
   const [tab, setTab] = useState('binance');
 
@@ -49,11 +52,11 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
     );
   }
 
-  // Manejador para Binance Pay
+  // Manejador para Binance Pay corregido con API_URL
   const handleBinanceDeposit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/deposits/create-binance-order', {
+      const response = await fetch(`${API_URL}/api/v1/deposits/create-binance-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: Number(amountBinance) }),
@@ -82,12 +85,12 @@ export default function DepositModal({ open, onClose, userId, onDone }) {
     }
   };
 
-  // Fase 1 (Fiat): Crear orden y congelar tasa
+  // Fase 1 (Fiat): Crear orden y congelar tasa corregido con API_URL
   const handleCreateOrder = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/deposits/create-fiat-order', {
+      const res = await fetch(`${API_URL}/api/v1/deposits/create-fiat-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
