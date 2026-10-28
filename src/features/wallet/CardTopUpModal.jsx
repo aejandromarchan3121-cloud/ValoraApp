@@ -37,7 +37,7 @@ export default function CardTopUpModal({ open, onClose, onSuccess }) {
         user_id: user.id,
         amount: amountNumeric,
         currency: selectedMethod.currency,
-        transaction_type: `DEPOSIT_${selectedMethod.id}`,
+        transaction_type: 'DEPOSIT',
         amount_bs: selectedMethod.id === 'BS' ? amountNumeric : null,
         amount_usdc: montoUsdc,
         status: 'PENDING' // <--- Cambia esto por 'PENDING', 'COMPLETED' o el estado que use tu base de datos
