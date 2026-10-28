@@ -50,6 +50,7 @@ export default function WalletDashboard() {
   const [modal, setModal] = useState(null); // receive | onramp | send | withdraw | card
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
+  console.log("ESTADO WALLET:", { wallet, profile, loading, error, userId });
 
   if (loading) return <p className="text-sm text-zinc-500">Cargando billetera…</p>;
   if (!wallet) return <p className="text-sm text-red-500">No se encontró tu billetera. Ejecuta la migración SQL y vuelve a entrar.</p>;
