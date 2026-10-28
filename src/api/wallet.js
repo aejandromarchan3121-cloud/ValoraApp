@@ -11,3 +11,7 @@ export const sendInternal = ({ recipient, amount, note, key }) =>
 
 export const withdrawExternal = ({ amount, address, network, key }) =>
   api('/transfer/withdraw-external', { method: 'POST', idempotencyKey: key, body: { amount, address, network } });
+
+// Recarga simulada: viaja SOLO el monto (nunca datos de tarjeta).
+export const topUpSandbox = ({ amountUsd, key }) =>
+  api('/wallet/topup-sandbox', { method: 'POST', idempotencyKey: key, body: { amount_usd: amountUsd } });

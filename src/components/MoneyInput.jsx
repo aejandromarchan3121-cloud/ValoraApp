@@ -6,9 +6,10 @@ import { formatMoneyInput, normalizePasted, padDecimals, parseMoney, toCanonical
  * Campo de dinero con miles y decimales en vivo (1000 → 1.000, coma = decimales).
  * - value: número (o '' / 0 para vacío)
  * - onChange(numero, textoCanonico): textoCanonico es "1234.56", ideal para enviar al backend
+ * - max: tope numérico opcional; si el usuario escribe más, el campo se corrige solo al tope
  */
 const MoneyInput = forwardRef(function MoneyInput(
-  { value, onChange, decimals = 2, padOnBlur = true, className, onBlur, ...rest },
+  { value, onChange, decimals = 2, max, padOnBlur = true, className, onBlur, ...rest },
   outerRef
 ) {
   const ref = useRef(null);
@@ -41,8 +42,12 @@ const MoneyInput = forwardRef(function MoneyInput(
     caret.current = null;
   }, [display]);
 
-  const commit = (next, caretTarget) => {
-    caret.current = caretTarget;
+  const clamp = (text) => (max != null && parseMoney(text) > max
+    ? formatMoneyInput(String(max).replace('.', ','), decimals) : text);
+
+  const commit = (rawNext, caretTarget) => {
+    const next = clamp(rawNext);
+    caret.current = next !== rawNext ? Infinity : caretTarget;
     setDisplay(next);
     onChange?.(parseMoney(next), toCanonical(next, decimals));
   };
