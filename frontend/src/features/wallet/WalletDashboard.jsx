@@ -47,13 +47,31 @@ const Action = ({ icon: Icon, label, onClick }) => (
 
 export default function WalletDashboard() {
   const { wallet, profile, txs, loading, error, userId, reload } = useWallet();
-  const [modal, setModal] = useState(null); // receive | onramp | send | withdraw | card
+  const [modal, setModal] = useState(null);
   const balance = Number(wallet?.usdc_balance ?? 0);
   const close = () => setModal(null);
-  console.log("ESTADO WALLET:", { wallet, profile, loading, error, userId });
 
-  if (loading) return <p className="text-sm text-zinc-500">Cargando billetera…</p>;
-  if (!wallet) return <p className="text-sm text-red-500">No se encontró tu billetera. Ejecuta la migración SQL y vuelve a entrar.</p>;
+  // Depuración en consola para ver qué trae exactamente el hook
+  console.log("DEBUG WALLET STATE:", { wallet, profile, txs, loading, error, userId });
+
+  if (loading) {
+    return (
+      <div className="p-8 rounded-2xl bg-zinc-800 text-white text-center">
+        <p className="text-lg font-bold">Cargando billetera…</p>
+        <p className="text-xs text-zinc-400 mt-1">ID de usuario: {userId || 'Buscando...'}</p>
+      </div>
+    );
+  }
+
+  if (!wallet) {
+    return (
+      <div className="p-6 rounded-2xl bg-red-950/60 border border-red-500 text-white space-y-2">
+        <p className="font-bold text-red-400">⚠️ No se encontró tu billetera en Supabase</p>
+        <p className="text-xs text-zinc-300">Usuario ID: {userId}</p>
+        <p className="text-xs text-zinc-300">Error técnico: {error || 'La tabla wallets no devolvió registros para este user_id.'}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
