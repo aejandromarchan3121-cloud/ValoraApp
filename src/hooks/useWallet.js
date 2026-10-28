@@ -7,14 +7,25 @@ export function useWallet() {
   const { user } = useAuth();
   const [state, setState] = useState({ wallet: null, profile: null, txs: [], loading: true, error: null });
  const load = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("useWallet: Esperando usuario...");
+      return;
+    }
+    console.log("useWallet: Cargando datos para el usuario:", user.id);
+
     const [w, p, t] = await Promise.all([
-      supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(), // <-- Añadido .eq('user_id', user.id)
+      supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(), // Asegúrate de usar user_id o id según tu BD
       supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
       supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(30),
     ]);
+
+    console.log("Resultado Wallets:", w);
+
     setState({
-      wallet: w.data, profile: p.data, txs: t.data ?? [], loading: false,
+      wallet: w.data, 
+      profile: p.data, 
+      txs: t.data ?? [], 
+      loading: false,
       error: w.error?.message ?? p.error?.message ?? t.error?.message ?? null,
     });
   }, [user]);
