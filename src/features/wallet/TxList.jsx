@@ -7,6 +7,7 @@ const LABEL = {
   INTERNAL_P2P: 'Transferencia',
   EXTERNAL_WITHDRAWAL: 'Retiro externo',
   FIAT_CASHOUT: 'Cambio a Bs',
+  CARD_TOPUP: 'Recarga con tarjeta',
 };
 const TONE = { COMPLETED: 'green', PENDING: 'amber', FAILED: 'red', CANCELLED: 'zinc' };
 const STATUS = { COMPLETED: 'Completada', PENDING: 'Pendiente', FAILED: 'Fallida', CANCELLED: 'Cancelada' };
