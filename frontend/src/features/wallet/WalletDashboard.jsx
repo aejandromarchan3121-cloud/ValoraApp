@@ -10,6 +10,7 @@ import SendModal from './SendModal';
 import WithdrawModal from './WithdrawModal';
 import TxList from './TxList';
 import CardTopUpModal from './CardTopUpModal';
+import { supabase } from '../../../../src/supabase';
 
 const SANDBOX_TOPUP = import.meta.env.VITE_SANDBOX_TOPUP === 'true';
 
@@ -44,6 +45,27 @@ const Action = ({ icon: Icon, label, onClick }) => (
     {label}
   </button>
 );
+export default function MiComponente() {
+  useEffect(() => {
+    // 1. Crear el canal
+    const canal = supabase
+      .channel('cash-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'cash_entries' },
+        (payload) => {
+          console.log('¡Cambio en tiempo real!', payload);
+        }
+      )
+      .subscribe();
+      
+          return () => {
+      supabase.removeChannel(canal);
+    };
+  }, []); // Array vacío para que SOLO se ejecute una vez al montar el componente
+
+  return <div>Monitoreando caja...</div>;
+}
 
 export default function WalletDashboard() {
   const { wallet, profile, txs, loading, error, userId, reload } = useWallet();
