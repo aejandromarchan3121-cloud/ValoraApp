@@ -2,24 +2,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { useAuth } from '../context/AuthContext';
 
-/** Billetera + perfil + últimos movimientos, con actualización en tiempo real (RLS aplica). */
+/** Billetera + perfil + últimos movimientos, optimizado sin WebSockets molestos. */
 export function useWallet() {
   const { user } = useAuth();
   const [state, setState] = useState({ wallet: null, profile: null, txs: [], loading: true, error: null });
- const load = useCallback(async () => {
-    if (!user) {
-      console.log("useWallet: Esperando usuario...");
-      return;
-    }
-    console.log("useWallet: Cargando datos para el usuario:", user.id);
 
+  const load = useCallback(async () => {
+    if (!user) return;
+    
     const [w, p, t] = await Promise.all([
-  supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(),
-  supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-  supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(30),
-]);
-
-    console.log("Resultado Wallets:", w);
+      supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(),
+      supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+      supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(30),
+    ]);
 
     setState({
       wallet: w.data, 
@@ -30,17 +25,11 @@ export function useWallet() {
     });
   }, [user]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { 
+    load(); 
+  }, [load]);
 
-  useEffect(() => {
-    if (!user) return undefined;
-    const ch = supabase
-      .channel(`wallet-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, load)
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [user, load]);
+  // Se eliminó la suscripción por WebSocket que causaba el conflicto y el bloqueo.
 
   return { ...state, userId: user?.id, reload: load };
 }
