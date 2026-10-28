@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowDownToLine, ArrowUpFromLine, CreditCard, Globe, Send } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, CreditCard, Globe, Send, Download } from 'lucide-react';
 import { supabase } from '../../supabase';
 import { Badge, Button, Card, Input, PageHeader } from '../../components/ui';
 import { useWallet } from '../../hooks/useWallet';
@@ -10,8 +10,6 @@ import SendModal from './SendModal';
 import WithdrawModal from './WithdrawModal';
 import TxList from './TxList';
 import CardTopUpModal from './CardTopUpModal';
-
-const SANDBOX_TOPUP = import.meta.env.VITE_SANDBOX_TOPUP === 'true';
 
 function UsernameSetup({ userId, onDone }) {
   const [u, setU] = useState('');
@@ -41,9 +39,11 @@ function UsernameSetup({ userId, onDone }) {
 
 const Action = ({ icon: Icon, label, onClick }) => (
   <button onClick={onClick}
-    className="flex flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-white/80 p-3 text-xs font-medium transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 dark:border-zinc-800 dark:bg-zinc-900/70">
-    <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-500/10 text-brand-500"><Icon size={18} /></span>
-    {label}
+    className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-xs font-medium text-zinc-200 transition-all hover:border-zinc-700 hover:bg-zinc-800/80 hover:shadow-lg active:scale-95">
+    <span className="grid h-10 w-10 place-items-center rounded-xl bg-zinc-800 text-zinc-100">
+      <Icon size={20} />
+    </span>
+    <span className="text-center">{label}</span>
   </button>
 );
 
@@ -55,47 +55,60 @@ export default function WalletDashboard() {
 
   if (loading) {
     return (
-      <div className="p-8 rounded-2xl bg-zinc-800 text-white text-center">
-        <p className="text-lg font-bold">Cargando billetera…</p>
-        <p className="text-xs text-zinc-400 mt-1">ID de usuario: {userId || 'Buscando...'}</p>
+      <div className="p-8 rounded-2xl bg-zinc-900 text-zinc-400 text-center border border-zinc-800">
+        <p className="text-lg font-medium">Cargando billetera…</p>
+        <p className="text-xs text-zinc-500 mt-1">ID de usuario: {userId || 'Buscando...'}</p>
       </div>
     );
   }
 
   if (!wallet) {
     return (
-      <div className="p-6 rounded-2xl bg-red-950/60 border border-red-500 text-white space-y-2">
-        <p className="font-bold text-red-400">⚠️ No se encontró tu billetera en Supabase</p>
-        <p className="text-xs text-zinc-300">Usuario ID: {userId}</p>
-        <p className="text-xs text-zinc-300">Error técnico: {error || 'La tabla wallets no devolvió registros para este user_id.'}</p>
+      <div className="p-6 rounded-2xl bg-red-950/40 border border-red-500/50 text-red-200 space-y-2">
+        <p className="font-bold">⚠️ No se encontró tu billetera en Supabase</p>
+        <p className="text-xs text-zinc-400">Usuario ID: {userId}</p>
+        <p className="text-xs text-zinc-400">Error técnico: {error || 'La tabla wallets no devolvió registros para este user_id.'}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
-      <PageHeader title="Billetera" subtitle="Dólares digitales (USDC) para enviar, recibir y retirar."
-        action={profile?.username && <Badge tone="brand">@{profile.username}</Badge>} />
+    <div className="space-y-6">
+      <PageHeader 
+        title="Billetera" 
+        subtitle="Dólares digitales (USDC) para enviar, recibir y retirar."
+        action={profile?.username && <Badge tone="brand">@{profile.username}</Badge>} 
+      />
+
       {error && <p className="text-sm text-red-500">{error}</p>}
-      {wallet.status !== 'ACTIVE' && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400">Tu billetera está {wallet.status === 'FROZEN' ? 'congelada' : 'cerrada'}. Contacta a soporte.</p>}
+      
+      {wallet.status !== 'ACTIVE' && (
+        <p className="rounded-xl bg-red-950/40 border border-red-500/30 p-3 text-sm text-red-300">
+          Tu billetera está {wallet.status === 'FROZEN' ? 'congelada' : 'cerrada'}. Contacta a soporte.
+        </p>
+      )}
+
       {!profile?.username && <UsernameSetup userId={userId} onDone={reload} />}
 
-      <Card className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-transparent to-emerald-500/10">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Saldo disponible</p>
-        <p className="mt-1 text-4xl font-semibold tabular-nums">{num(balance)} <span className="text-lg text-zinc-500">USDC</span></p>
-        <p className="mt-1 text-xs text-zinc-500">≈ {num(balance)} USD · tu saldo también se refleja en Caja</p>
+      <Card className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-transparent to-emerald-500/10 border-zinc-800">
+        <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Saldo disponible</p>
+        <p className="mt-1 text-4xl font-semibold tracking-tight text-white tabular-nums">
+          {num(balance)} <span className="text-lg font-normal text-zinc-400">USDC</span>
+        </p>
+        <p className="mt-1 text-xs text-zinc-400">≈ {num(balance)} USD · tu saldo también se refleja en Caja</p>
       </Card>
 
-      <div className={`grid grid-cols-2 gap-3 ${SANDBOX_TOPUP ? 'sm:grid-cols-5' : 'sm:grid-cols-4'}`}>
+      {/* Los 5 botones de acción organizados idénticos a tu referencia */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <Action icon={Download} label="Depositar / Recargar" onClick={() => setModal('card')} />
         <Action icon={ArrowDownToLine} label="Recibir de EE. UU." onClick={() => setModal('receive')} />
         <Action icon={Globe} label="Enviar desde EE. UU." onClick={() => setModal('onramp')} />
         <Action icon={Send} label="Enviar @usuario" onClick={() => setModal('send')} />
         <Action icon={ArrowUpFromLine} label="Retirar a Binance" onClick={() => setModal('withdraw')} />
-        {SANDBOX_TOPUP && <Action icon={CreditCard} label="Recargar con tarjeta" onClick={() => setModal('card')} />}
       </div>
 
-      <Card>
-        <p className="mb-2 text-sm font-medium">Movimientos recientes</p>
+      <Card className="border-zinc-800 bg-zinc-900/40">
+        <p className="mb-4 text-sm font-medium text-zinc-200">Movimientos recientes</p>
         <TxList txs={txs} userId={userId} />
       </Card>
 
